@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     #Local app
     'library.apps.LibraryConfig',
-
+    'career.apps.CareerConfig',
     #Django app
 
     'django.contrib.admin',
