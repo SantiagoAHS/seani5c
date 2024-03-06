@@ -1,13 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
-from career.admin import Carrer
-from library.models import Module
+from career.models import Carrer
+from library.models import Module, Question
 
 
 # Create your models here.
 class Stage(models.Model):
-
-
 
     stage = models.IntegerField(
         verbose_name =  "Etapa",
@@ -47,8 +45,39 @@ class Exam(models.Model):
     modules = models.ManyToManyField(Module,
                                      through='ExamModule',
                                      verbose_name = "Modulos")
+    question = models.ManyToManyField(
+        Question,
+        verbose_name="preguntas"
+    )
     score = models.FloatField(verbose_name = "Calificación",
                               default = 0.0)
+    created = models.DateTimeField(
+        auto_now_add = True, 
+        verbose_name = 'Fecha de Creacion')
+    updated = models.DateTimeField(auto_now = True,
+                                   verbose_name = 'Fecha de Actualizacion')
+    
+    def set_modules(self):
+        for module in Module.objects.all():
+            self.modules.add(module)
+
+    def set_questions(self):
+        for Module in self.modules.all():
+            for question in Question.objects.filter(module = Module):
+                Breakdown.objects.create(
+                    exam = self,
+                    question = question,
+                    correct = question.correct,
+
+                )
+
+
+    def __str__(self):
+        return f"{self.user} - {self.career}: {self.score}"
+    
+    class Meta:
+        verbose_name = "Examen",
+        verbose_name_plural = "Examenes"
 
 
 class ExamModule(models.Model):
@@ -62,3 +91,29 @@ class ExamModule(models.Model):
                                  verbose_name = "Activo")
     score = models.FloatField(default = 0.0,
                               verbose_name = "Calificacion")
+    
+    def __str__(self) :
+        return f"{self.module} - {self.score}"
+
+
+
+class Breakdown(models.Model):
+    exam = models.ForeignKey(Exam,
+                              on_delete = models.CASCADE,
+                              verbose_name = "Examen")
+    question = models.ForeignKey(Question,
+                                 on_delete = models.CASCADE,
+                                 verbose_name = "Pregunta")
+    answer = models.CharField(max_length=5,
+                              verbose_name = "Respuesta",
+                              default = '-')
+    correct = models.CharField(max_length = 5,
+                                  verbose_name = "Correcta",
+                                  default = '-')
+    
+    def __str__(self) :
+        return f"{self.question} - {self.answer} - {self.correct}"  
+    
+    class Meta:
+        verbose_name = "Desglose"
+        verbose_name_plural = "Desglosos"
