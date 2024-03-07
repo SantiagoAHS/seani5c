@@ -5,6 +5,9 @@ from .models import Exam
 
 from .forms import CandidateForm
 # Create your views here.
+def home(request):
+    user = request.user
+    return render(request, 'exam/home.html',{'user':user})
 
 def add_candidate(request):
     if request.method =='POST':
