@@ -79,9 +79,9 @@ WSGI_APPLICATION = 'seani.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'seani',
-        'USER': 'root',
-        'PASSWORD':'',
+        'NAME': str(os.environ.get('DB_NAME')) ,
+        'USER': str(os.environ.get('DB_USER')), 
+        'PASSWORD':str(os.environ.get('DB_PASSWORD')), 
         'HOST':'localhost',
         'PORT': '3306'
     }
@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-mx'
 
-TIME_ZONE = 'America/Mexico_city'
+TIME_ZONE = 'America/Mexico_City'
 
 USE_I18N = True
 
@@ -123,7 +123,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'static'] #///developmet
+#STATIC_ROOT = BASE_DIR / 'static/' # Production
+
 
 
 # Default primary key field type
