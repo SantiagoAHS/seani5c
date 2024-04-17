@@ -1,4 +1,6 @@
+{% extends 'base.html'%}
 
+{% block content %}
     <h1>Welcome {{ user.username}}</h1>
 
     <p>{{ user.first_name}}</p>
@@ -14,4 +16,5 @@
         {% csrf_token %}
         <input type="submit" value="Salir">
     </form>
+{% endblock %}
 

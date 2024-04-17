@@ -14,28 +14,34 @@ def home(request):
     return render(request, 'exam/home.html',{'user':user})
 
 @login_required
-def question(request, m_id, q_id = 1):
+def question(request, m_id, q_id=1):
     exam = request.user.exam
     if request.method == 'POST':
-        answer = request.POST['answer']
+        answer = request.POST.get('answer')
         questions = exam.breakdown_set.filter(question__module_id=m_id)
+        if q_id > len(questions) or q_id < 1:
+            return redirect('exam:home')  # Si el ID de la pregunta está fuera de rango, redirige a la página de inicio
         question = questions[q_id - 1]
         question.answer = answer
         question.save()
-        return redirect('exam:question', m_id, q_id + 1)
-    
-    try:
+        if q_id == len(questions):  # Si es la última pregunta, redirige a la página de inicio
+            exam.compute_score_by_module(m_id)
+            exam.compute_score()
+            return redirect('exam:home')
+        else:
+            return redirect('exam:question', m_id, q_id + 1)
+    else:
         questions = exam.breakdown_set.filter(question__module_id=m_id)
+        if q_id > len(questions) or q_id < 1:
+            return redirect('exam:home')  # Si el ID de la pregunta está fuera de rango, redirige a la página de inicio
         question = questions[q_id - 1].question
-        answer = questions[q_id -1].answer
-        return render(request, 'exam/question.html',{
-            'question':question, 
-            'answer': answer, 
-            'm_id': m_id, 
+        answer = questions[q_id - 1].answer
+        return render(request, 'exam/question.html', {
+            'question': question,
+            'answer': answer,
+            'm_id': m_id,
             'q_id': q_id
-            })
-    except IndexError:
-        return redirect('exam:home')
+        })
 
 @login_required
 def add_candidate(request):

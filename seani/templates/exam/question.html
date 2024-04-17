@@ -1,3 +1,6 @@
+{% extends 'base.html'%}
+
+{% block content %}
 <h1>{{ question.module }}</h1>
 <hr>
 {% if question.question_text %}
@@ -12,8 +15,7 @@
     method="post">
     {% csrf_token %}
     <input type="radio" name="answer" id="ans0" value="-"
-    {% if correct == '-' %}checked{% endif %}>
-    <label for="ans0">Respuesta Actual</label><br>
+    {% if correct == '-' %}checked{% endif %} style="display: none;"> 
     <input type="radio" name="answer" id="ans1" value="A"
     {% if correct == 'A' %}checked{% endif %}>
     <label for="ans1">{{ question.answer1 }}</label><br>
@@ -32,3 +34,4 @@
     {% endif %}
     <input type="submit" value="Siguiente">
 </form>
+{% endblock %}

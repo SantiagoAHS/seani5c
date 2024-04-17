@@ -74,16 +74,28 @@ class Exam(models.Model):
         score = 0.0
         for exammodule in self.exammodule_set.all():
             score += exammodule.score
-        self.score = score / score.modules.count()
+        if self.exammodule_set.count() != 0:
+            self.score = score / self.exammodule_set.count()
+        else:
+            self.score = 0.0  # Manejar el caso cuando no hay módulos asociados al examen
         self.save()
 
-    def compute_score_by_module(self , m_id):
+    def compute_score_by_module(self, m_id):
         score = 0.0
-        for question in self.breakdown_set.filter(question__module_id=m_id):
-            if question.answer == question.correct:
-                score +=10
-        module = self.exammodule_set.get(module_id=m_id)
-        module.score = score / self.question.filter(module_id=m_id).count()
+        questions = self.breakdown_set.filter(question__module_id=m_id)
+        question_count = questions.count()
+
+        if question_count > 0:
+            for question in questions:
+                if question.answer == question.correct:
+                    score += 10
+            module = self.exammodule_set.get(module_id=m_id)
+            module.score = score / question_count
+            module.save()
+        else:
+            # Manejar el caso cuando no hay preguntas asociadas al módulo
+            module = self.exammodule_set.get(module_id=m_id)
+            module.score = 0.0
         module.save()
 
     def __str__(self):
